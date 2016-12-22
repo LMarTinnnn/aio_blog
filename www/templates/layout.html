@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    {% block meta%}<!--block for meata-->{% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/mycss.css">
+    <link rel="stylesheet" href="/static/css/uikit.min.css">
+    <link rel="stylesheet" href="/static/css/uikit.gradient.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/sha1.min.js"></script>
+    <script src="/static/js/uikit.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/awesome.js"></script>
+    {% block beforehead %}{% endblock %}
+  </head>
+    <body>
+      <div class="icon-bar">
+        <ul class='icon'>
+          <li>GitHub</li>
+          <li>Instagram</li>
+          <li>Aliyun</li>
+          {% if __user__ %}
+          {% if __user__.admin %}
+          <li><a href="/manage/blogs/create">编辑</a></li>
+          {% endif %}
+          <li><img src="{{ __user__.avatar }}" alt="Avatar" class='avatar'>
+            <b>{{ __user__.name }}</b></li>
+          <li><a href="/api/signout">登出</a></li>
+          {% else %}
+          <li><a href="/signin">登录</a></li>
+          <li><a href="/signup">注册</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <header>
+
+        <div class="logo"><img src="/static/pics/logo.jpg" alt="Logo"></div>
+
+        <nav>
+          <ul class="nav">
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Photo</a></li>
+            <li><a href="#">About Me</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main>
+        {% block content %}
+        {% endblock %}
+      </main>
+
+      <footer>
+        <div class="left" style="inline block">
+          <p>
+            <img src="/static/pics/logo.jpg" alt="log">
+            <a href="#">About Me</a>
+            / Built at 2016
+          </p>
+        </div>
+        <div class="right" style="inline block">
+          <form class="search" action="/search" method="get">
+            <input type="text" name="artical_name">
+            <input type="submit" value="搜索">
+          </form>
+          <p>Copyright &copy; 2016. LMarTinnnn All Right Reserved</p>
+          <p>Poweredby Aliyun</p>
+        </div>
+      </footer>
+    </body>
+</html>

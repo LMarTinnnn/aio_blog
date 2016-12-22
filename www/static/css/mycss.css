@@ -1,0 +1,28 @@
+ul.nav li {
+  display: inline-block;
+}
+
+ul.icon li {
+  display: inline-block;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.avatar {
+  width: 20px;
+  height: 20px;
+}
+
+div.icon-bar {
+  background-color: black;
+  color: white;
+  width: 100%;
+}
+
+div.logo {
+
+}
