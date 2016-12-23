@@ -138,8 +138,8 @@ class RequestHandler(object):
                         filtered_kw[name] = kw[name]
                 kw = filtered_kw
 
-            # check named arg:
             for k, v in request.match_info.items():
+                # 加入匹配/url/{args}的args
                 if k in kw:
                     logging.warning('Duplicate arg name in named arg and kw args: %s' % k)
                 kw[k] = v

@@ -15,7 +15,7 @@ import markdown2
 from conf.config import configs
 from async_web_framework import get, post
 from model import User, Blog, Comment, create_id
-from apis import APIResourceNotFoundError, APIValueError, APIError, APIPermissionError
+from apis import APIResourceNotFoundError, APIValueError, APIError, APIPermissionError, Page
 
 
 # -------------------------------cookie 处理函数------------------------------------
@@ -59,18 +59,30 @@ async def cookie2user(cookie_str):
 # ------------------------------ Helper --------------------------------------
 def check_admin(request):
     if not request.__admin__:
-        raise APIPermissionError('No userity')
+        raise APIPermissionError('No authority')
+
+
+def text2html(text):
+    lines = map(lambda s: '%s' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'),
+                filter(lambda s: s.strip() != '', text.split('\n')))
+    return ''.join(lines)
+
+
+def get_page_index(page_str):
+    p = 1
+    try:
+        p = int(page_str)
+    except ValueError as e:
+        pass
+    if p < 1:
+        p = 1
+    return p
 
 
 # ------------------------------ url handler --------------------------------------
 @get('/')
 async def index(request):
-    summary = '我是简介哈哈哈哈'
-    blogs = [
-        Blog(id='1', name='Test Blog', summary=summary, created_at=time.time() - 120),
-        Blog(id='2', name='Something New', summary=summary, created_at=time.time() - 3600),
-        Blog(id='3', name='Learn Swift', summary=summary, created_at=time.time() - 6049801212)
-    ]
+    blogs = await Blog.find_all(limit=6)
     return dict(
         __template__='index.html',
         blogs=blogs,
@@ -92,13 +104,50 @@ def signin():
     }
 
 
+@get('/manage/blogs')
+def manage_blog(*, page=1):
+    return {
+        '__template__': 'manage_blogs.html',
+        'page_index': page
+    }
+
+
 @get('/manage/blogs/create')
-def crete_blog(request):
+def crete_blog(request):  # 创建日志
     return {
         '__template__': 'blog_edit.html',
         'id': '',
         'action': '/api/blogs',
         '__user__': request.__user__
+    }
+
+
+@get('/manage/blogs/edit')
+def edit_blog(request, *, blog_id):  # 编辑存在的日志
+    return {
+        '__template__': 'blog_edit.html',
+        'id': blog_id,
+        'action': '/api/blogs',
+        '__user__': request.__user__
+    }
+
+
+@get('/blog/{blog_id}')
+async def read_blog(blog_id, request):
+    blog = await Blog.find_by_primary_key(blog_id)
+    if not blog:
+        raise APIResourceNotFoundError('blog', '似乎来到了没有知识的荒原')
+    comments = await Comment.find_all(where='blog_id=?', args=[blog_id], order_by='created_at DESC')
+
+    # escape
+    for c in comments:
+        c.html_content = text2html(c.content)
+    blog.html_content = markdown2.markdown(blog.content)
+    return {
+        '__template__': 'blog.html',
+        '__user__': request.__user__,
+        'blog': blog,
+        'comments': comments
     }
 
 
@@ -169,6 +218,33 @@ def signout(request):
     return resp
 
 
+@get('/api/blogs/{blog_id}')
+async def get_json_blog(*, blog_id):
+    blog = await Blog.find_by_primary_key(blog_id)
+    if not blog:
+        raise APIResourceNotFoundError('No such blog')
+    return blog
+
+
+@get('/api/blogs')
+async def get_blogs(*, page=1):
+    page_index = get_page_index(page)
+    blog_count = await Blog.count_rows('id')
+    p = Page(blog_count, page_index)
+    if blog_count == 0:
+        return dict(
+            page=p,
+            blogs=()
+        )
+
+    blogs = await Blog.find_all(order_by='created_at DESC', limit=(p.offset, p.limit))
+    # limit 用来标记从第几行开始取值 取多少个
+    return dict(
+        page=p,
+        blogs=blogs
+    )
+
+
 @post('/api/blogs')
 async def post_blog(request, *, name, summary, content):
     check_admin(request)
@@ -193,5 +269,12 @@ async def post_blog(request, *, name, summary, content):
     return blog   # blog是dict的子类 在response_factory 会处理成json对象
 
 
-if __name__ == '__main__':
-    pass
+@post('/api/blogs/{blog_id}/delete')
+async def delete_blog(request, *, blog_id):
+    check_admin(request)
+    blog_to_delete = await Blog.find_by_primary_key(blog_id)
+    if not blog_to_delete:
+        logging.info('blog [%s] does not exist' % blog_id)
+        raise APIPermissionError('blog does not exist')
+    await blog_to_delete.delete()
+    return dict(id=blog_id)

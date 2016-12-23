@@ -3,17 +3,19 @@
 {% block title %}LMarTinnn{% endblock %}
 
 {% block content %}
-  {% for blog in blogs %}
-  <div class="mainpart">
-    <h3>Recent</h3>
-    <article class="">
-      <h3><a href="/blog/{id}">{{ blog.name }}</a></h3>
-      <p>发表于: {{ blog.created_at|datetime }}</p>
-      <p>{{ blog.summary }}...</p>
-      <p><a href="/blog/{id}"><b>继续阅读</b></a></p>
-    </article>
-    <hr />
+  <h3>Recent</h3>
+  <div class="contents">
+    {% for blog in blogs %}
+      <article class="blogs">
+        <h3><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h3>
+        <p>发表于: {{ blog.created_at|datetime }}</p>
+        <p>{{ blog.summary }}...</p>
+        <p><a href="/blog/{{ blog.id }}"><b>继续阅读</b></a></p>
+      </article>
+    {% else %}
+      <p>Unbelievable! No article so far</p>
+    {% endfor %}
   </div>
-  {% endfor %}
+
 
 {% endblock %}

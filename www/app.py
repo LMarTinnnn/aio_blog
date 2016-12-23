@@ -14,18 +14,13 @@ from async_web_framework import add_routes, add_static
 from factorys_and_filters import logger_factory, data_factory, response_factory, datetime_filter, auth_factory
 
 
-async def mk_server(application, event_loop):
-    srv = await event_loop.create_server(application.make_handler(), '0.0.0.0', 8000)
-    logging.info('[SRV]: Start serving at port [8000]')
-    return srv
-
-
 def init_jinja2(application, **kwargs):
     logging.info('[Jinja2]: Initiating...')
     configs = dict(
         autoescape=kwargs.get('autoescape', True),
         # 设置block的起始字符串
         block_start_string=kwargs.get('block_start_string', '{%'),
+        block_end_string=kwargs.get('block_end_string', '%}'),
         variable_start_string=kwargs.get('variable_start_string', '{{'),
         variable_end_string=kwargs.get('variable_end_string', '}}'),
         auto_reload=kwargs.get('auto_reload', True)
