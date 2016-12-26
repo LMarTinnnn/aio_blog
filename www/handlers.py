@@ -82,7 +82,7 @@ def get_page_index(page_str):
 # ------------------------------ url handler --------------------------------------
 @get('/')
 async def index(request):
-    blogs = await Blog.find_all(limit=6)
+    blogs = await Blog.find_all(limit=8, order_by='created_at DESC')
     return dict(
         __template__='index.html',
         blogs=blogs,
@@ -105,10 +105,11 @@ def signin():
 
 
 @get('/manage/blogs')
-def manage_blog(*, page=1):
+def manage_blog(request, *, page=1):
     return {
         '__template__': 'manage_blogs.html',
-        'page_index': page
+        'page_index': page,
+        '__user__': request.__user__
     }
 
 
@@ -127,7 +128,7 @@ def edit_blog(request, *, blog_id):  # 编辑存在的日志
     return {
         '__template__': 'blog_edit.html',
         'id': blog_id,
-        'action': '/api/blogs',
+        'action': '/api/blogs/edit/',
         '__user__': request.__user__
     }
 
@@ -210,7 +211,7 @@ async def api_signin(*, email, password):
 
 
 @get('/api/signout')
-def signout(request):
+def api_signout(request):
     referer = request.get('Referer')
     resp = web.HTTPFound(referer or '/')
     resp.set_cookie(COOKIE_NAME, '-delete-', max_age=0, httponly=True)
@@ -219,7 +220,7 @@ def signout(request):
 
 
 @get('/api/blogs/{blog_id}')
-async def get_json_blog(*, blog_id):
+async def api_get_json_blog(*, blog_id):
     blog = await Blog.find_by_primary_key(blog_id)
     if not blog:
         raise APIResourceNotFoundError('No such blog')
@@ -227,7 +228,7 @@ async def get_json_blog(*, blog_id):
 
 
 @get('/api/blogs')
-async def get_blogs(*, page=1):
+async def api_get_blogs(*, page=1):
     page_index = get_page_index(page)
     blog_count = await Blog.count_rows('id')
     p = Page(blog_count, page_index)
@@ -246,7 +247,7 @@ async def get_blogs(*, page=1):
 
 
 @post('/api/blogs')
-async def post_blog(request, *, name, summary, content):
+async def api_post_blog(request, *, name, summary, content):
     check_admin(request)
     if not name or not name.strip():
         raise APIValueError(name, message='标题不能为空')
@@ -270,7 +271,7 @@ async def post_blog(request, *, name, summary, content):
 
 
 @post('/api/blogs/{blog_id}/delete')
-async def delete_blog(request, *, blog_id):
+async def api_delete_blog(request, *, blog_id):
     check_admin(request)
     blog_to_delete = await Blog.find_by_primary_key(blog_id)
     if not blog_to_delete:
@@ -278,3 +279,16 @@ async def delete_blog(request, *, blog_id):
         raise APIPermissionError('blog does not exist')
     await blog_to_delete.delete()
     return dict(id=blog_id)
+
+@post('/api/blogs/edit/{blog_id}')
+async def api_edit_blog(request, *, name, summary, content, blog_id):
+    check_admin(request)
+    blog_to_edit = await Blog.find_by_primary_key(blog_id)
+    if not blog_to_edit:
+        logging.info('blog [%s] does not exist' % blog_id)
+        raise APIPermissionError('blog does not exist')
+    blog_to_edit.name = name
+    blog_to_edit.summary = summary
+    blog_to_edit.content = content
+    await blog_to_edit.update_data()
+    return blog_to_edit

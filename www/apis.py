@@ -20,6 +20,7 @@ class Page(object):
             self.limit = self.page_size
         self.has_next = self.page_index < self.page_count
         self.has_previous = self.page_index > 1
+        self.page_count = list(range(1, self.page_count + 1 ))
 
 
 class APIError(Exception):
