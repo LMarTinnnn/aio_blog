@@ -1,5 +1,4 @@
 
-
 {% extends 'layout.html' %}
 
 {% block title %}管理日志{% endblock %}
@@ -48,7 +47,8 @@ $(function() {
 {% endblock %}
 
 {% block content %}
-
+<div class="uk-container uk-container-center">
+  <div class="uk-grid">
     <div class="uk-width-1-1 uk-margin-bottom">
         <div class="uk-panel uk-panel-box">
             <ul class="uk-breadcrumb">
@@ -98,8 +98,8 @@ $(function() {
         </table>
 
         <div v-component="pagination" v-with="page"></div>
-
-
     </div>
+  </div>
+</div>
 
 {% endblock %}

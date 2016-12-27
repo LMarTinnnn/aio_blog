@@ -3,19 +3,35 @@
 {% block title %}LMarTinnn{% endblock %}
 
 {% block content %}
-  <h3>Recent</h3>
+  <div class="pic_gallary">
+    <p>           ss</p>
+    <div class="topic">
+      <p>Depression?</p>
+      <br>
+      <p>So What?</p>
+    </div>
+  </div>
+
+  <h3 class="recent">Recent</h3>
   <div class="contents">
     {% for blog in blogs %}
-      <article class="blogs">
-        <h3><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h3>
-        <p>发表于: {{ blog.created_at|datetime }}</p>
-        <p>{{ blog.summary }}...</p>
-        <p><a href="/blog/{{ blog.id }}"><b>继续阅读</b></a></p>
-      </article>
+
+    <article class="blogs">
+
+      <div class="pic">
+        <img src="/static/pics/show.jpg">
+      </div>
+
+      <div class="text">
+        <h4><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h3>
+        <p>{{ blog.user_name }} / {{ blog.created_at|datetime }}</p>
+        <p><a href="/blog/{{ blog.id }}">{{ blog.summary }}</a></p>
+      </div>
+
+    </article>
     {% else %}
       <p>Unbelievable! No article so far</p>
     {% endfor %}
   </div>
-
 
 {% endblock %}

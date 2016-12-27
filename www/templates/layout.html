@@ -12,29 +12,39 @@
     <script src="/static/js/uikit.min.js"></script>
     <script src="/static/js/vue.min.js"></script>
     <script src="/static/js/awesome.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Thambi" rel="stylesheet">
     {% block beforehead %}{% endblock %}
   </head>
     <body>
       <div class="icon-bar">
-        <ul class="user">
-          {% if __user__ %}
-          {% if __user__.admin %}
-          <li><a href="/manage/blogs">编辑</a></li>
-          {% endif %}
-          <li><img src="{{ __user__.avatar }}" alt="Avatar" class='avatar'>
-            <b>{{ __user__.name }}</b></li>
-          <li><a href="/api/signout">登出</a></li>
-          {% else %}
-          <li><a href="/signin">登录</a></li>
-          <li><a href="/signup">注册</a></li>
-          {% endif %}
-        </ul>
-        <ul class='icon'>
-          <li><a href="https://github.com/LMarTinnnn" class="uk-icon-small uk-icon-github"></a></li>
-          <li><a href="https://www.instagram.com" class="uk-icon-small uk-icon-instagram"></a></li>
-          <li><a href="https://www.weibo.com" class="uk-icon-small uk-icon-weibo"></a></li>
-          <li><a href="https://www.apple.com" class="uk-icon-small uk-icon-apple"></a></li>
-        </ul>
+
+        <div class="user">
+          <ul>
+            {% if __user__ %}
+            {% if __user__.admin %}
+            <li><a href="/manage/blogs">编辑</a></li>
+            {% endif %}
+            <li><img src="{{ __user__.avatar }}" alt="Avatar" class='avatar'>
+              <b>{{ __user__.name }}</b></li>
+            <li><a href="/api/signout">登出</a></li>
+            {% else %}
+            <li><a href="/signin">登录</a></li>
+            <li><a href="/signup">注册</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="icon">
+          <ul>
+            <li><a href="https://github.com/LMarTinnnn" class="uk-icon-small uk-icon-github"></a></li>
+            <li><a href="https://www.instagram.com" class="uk-icon-small uk-icon-instagram"></a></li>
+            <li><a href="https://www.weibo.com" class="uk-icon-small uk-icon-weibo"></a></li>
+            <li><a href="https://www.apple.com" class="uk-icon-small uk-icon-apple"></a></li>
+          </ul>
+        </div>
+
       </div>
       <header>
         <div class="logo">
@@ -42,9 +52,9 @@
         </div>
         <nav>
           <ul>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Photo</a></li>
-            <li><a href="#">Message Board</a></li>
+            <li><a class="nav_button" href="#">Blog</a></li>
+            <li><a class="nav_button" href="#">Photo</a></li>
+            <li><a class="nav_button" href="#">Message Board</a></li>
           </ul>
         </nav>
       </header>
@@ -58,8 +68,9 @@
         <div class="left">
           <p>
             <img src="/static/pics/logo.jpg" alt="log" width="50px" height="50px">
+            <br/>
             <a href="#">About Me</a>
-            / Built at 2016
+            / Since 2016
           </p>
         </div>
         <div class="right">

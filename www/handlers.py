@@ -280,6 +280,7 @@ async def api_delete_blog(request, *, blog_id):
     await blog_to_delete.delete()
     return dict(id=blog_id)
 
+
 @post('/api/blogs/edit/{blog_id}')
 async def api_edit_blog(request, *, name, summary, content, blog_id):
     check_admin(request)
